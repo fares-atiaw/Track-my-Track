@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Track your track</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="app_definition">This app tracks your route throughout certain miles on the map</string>
+    <string name="permissions_note">Make sure to allow the access for the foreground and the background permissions to start the tracking process</string>
+</resources>
