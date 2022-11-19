@@ -11,20 +11,28 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.viewModels
 import com.example.trackmytrack.R
+import com.example.trackmytrack.databinding.FragmentPrimerBinding
 import com.google.android.material.snackbar.Snackbar
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
+    val viewModel: MainViewModel by viewModels({ requireActivity() })
+    private lateinit var binding : FragmentPrimerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_primer, container, false)
+        binding = FragmentPrimerBinding.inflate(inflater, container, false)
+
+        binding.data = viewModel
+        binding.lifecycleOwner = this
+
+        return binding.root
     }
 
 
@@ -34,10 +42,11 @@ class PrimerFragment : Fragment() {
         // After the user choose from the Permission-Dialog ↴
         if (permissions.values.all { it }) {
             // Now all the 3 permissions are granted
-
+//            checkDeviceLocationSettingsThenStartGeofence()
         } else {
             //todo snakebar
         }
     }
+
 
 }
