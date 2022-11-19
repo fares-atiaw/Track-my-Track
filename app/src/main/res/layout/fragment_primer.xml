@@ -141,11 +141,12 @@
                 android:layout_marginVertical="32dp"
                 android:padding="10dp"
                 android:text="Start Track"
+                android:checkForAction="@{data.allGranted}"
                 android:textSize="26sp"
                 android:textAllCaps="false"
                 android:textColor="@color/white"
                 android:letterSpacing="0.05"
-                android:enabled="false" />
+                />
 
         </LinearLayout>
     </ScrollView>

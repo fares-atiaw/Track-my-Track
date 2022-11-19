@@ -14,6 +14,10 @@ class MainViewModel : ViewModel() {
     val backgroundEnabled : LiveData<Boolean>
         get() = _backgroundEnabled
 
+    private var _allGranted = MutableLiveData<Boolean>(false)
+    val allGranted : LiveData<Boolean>
+        get() = _allGranted
+
     fun enableForeground() {
         _foregroundEnabled.postValue(true)
     }
@@ -21,5 +25,13 @@ class MainViewModel : ViewModel() {
     fun enableBackground() {
         _backgroundEnabled.postValue(true)
     }
+
+    fun allNeedsAreGranted() {
+        _allGranted.postValue(true)
+    }
+//    fun disableStartStop() {
+//        _allGranted.postValue(false)
+//    }
+
 
 }

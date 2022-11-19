@@ -6,6 +6,7 @@ import androidx.annotation.RequiresApi
 
 /**Variables**/
 val runningQOrLater = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
+const val REQUEST_TURN_DEVICE_LOCATION_ON = 11
 
 /**Functions**/
 fun getForegroundPermissionsArray(): Array<String>

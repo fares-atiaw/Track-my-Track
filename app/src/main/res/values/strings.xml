@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Track your track</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="settings">Settings</string>
+    <string name="settings">Go Settings</string>
+    <string name="enable">Go Enable</string>
 
     <!-- TODO: Text -->
     <string name="app_definition">This app tracks your route throughout certain miles on the map</string>
-    <string name="permissions_note">Make sure to allow the access for the foreground and the background permissions during the tracking time</string>
+    <string name="permissions_note">Make sure to enable the device location, \u0026 the access for the foreground \u0026 background permissions during the tracking time</string>
 
 <!--  TODO: Snakebar-->
     <string name="foreground_permission_required_error">Foreground permission must be granted to use the app</string>

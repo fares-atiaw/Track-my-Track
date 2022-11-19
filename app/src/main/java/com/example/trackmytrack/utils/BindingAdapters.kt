@@ -22,3 +22,10 @@ fun checkIfEnabled(btn: Button, flag: Boolean)
 //        btn.setBackgroundColor(Color.parseColor("950505"))    //btn.resources.getColor(R.color.custom_red)
     }
 }
+
+@BindingAdapter("android:checkForAction")
+fun checkForActions(btn: Button, flag: Boolean)
+{
+//        btn.isEnabled = !flag
+//        btn.isActivated = !flag
+}
