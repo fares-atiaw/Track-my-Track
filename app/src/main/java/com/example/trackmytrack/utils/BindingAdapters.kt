@@ -10,11 +10,13 @@ fun checkIfEnabled(btn: Button, flag: Boolean)
 {
     if(flag) {
         btn.isEnabled = false
+        btn.isActivated = false
         btn.text = "Enabled"
         btn.setBackgroundColor(btn.resources.getColor(R.color.custom_green))
     }
     else{
         btn.isEnabled = true
+        btn.isActivated = true
         btn.text = "Enable"
         btn.setBackgroundColor(btn.resources.getColor(R.color.custom_red))    //btn.resources.getColor(R.color.custom_red)
 //        btn.setBackgroundColor(Color.parseColor("950505"))    //btn.resources.getColor(R.color.custom_red)

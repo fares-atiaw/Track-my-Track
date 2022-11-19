@@ -1,20 +1,17 @@
 package com.example.trackmytrack.ui
 
-import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
-import android.location.LocationRequest
-import android.os.Build
+import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.trackmytrack.BuildConfig
 import com.example.trackmytrack.R
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
 import com.example.trackmytrack.utils.*
@@ -40,24 +37,30 @@ class PrimerFragment : Fragment() {
             viewModel.enableBackground()
 
         binding.btnForeground.setOnClickListener {
+            Log.e("btnForeground", "Hereee")
             if(requireContext().isForegroundLocationPermissionsGranted())
                 return@setOnClickListener
 
-            resolutionForResult.launch(getForegroundPermissionsArray())
+            foregroundPermissionResult.launch(getForegroundPermissionsArray())
         }
 
         binding.btnBackground.setOnClickListener {
-            if(requireContext().isBackgroundLocationPermissionsGranted())
+            Log.e("btnBackground", "Hereee")
+            if(requireContext().isBackgroundLocationPermissionsGranted()){
+                viewModel.enableBackground()
                 return@setOnClickListener
+            }
 
-            resolutionForResult.launch(getBackgroundPermissionArray())
+            backgroundPermissionResult.launch(getBackgroundPermissionArray())
         }
+
+
 
         return binding.root
     }
 
 
-    private val resolutionForResult = registerForActivityResult(
+    private val foregroundPermissionResult = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
         // After the user choose from the Permission-Dialog ↴
@@ -65,8 +68,45 @@ class PrimerFragment : Fragment() {
             // Now all the permissions are granted
             viewModel.enableForeground()
             //todo check device location enablement
+            Log.e("foregroundResult", "Heree0")
         } else {
+            Log.e("foregroundResult", "Heree1")
             //todo snakebar
+            Snackbar.make(binding.root, R.string.foreground_permission_required_error, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.settings) {
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                        )
+                    )
+                }
+                .show()
+        }
+    }
+
+    private val backgroundPermissionResult = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        // After the user choose from the Permission-Dialog ↴
+        if (permissions.values.all { it }) {
+            // Now all the permissions are granted
+            viewModel.enableBackground()
+            Log.e("backgroundResult", "Heree0")
+            //todo check device location enablement
+        } else {
+            Log.e("backgroundResult", "Heree1")
+            //todo snakebar
+            Snackbar.make(binding.root, R.string.background_permission_required_error, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.settings) {
+                    startActivity(
+                        Intent(
+                            Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                            Uri.parse("package:" + BuildConfig.APPLICATION_ID)
+                        )
+                    )
+                }
+                .show()
         }
     }
 

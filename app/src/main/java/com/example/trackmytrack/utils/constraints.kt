@@ -17,7 +17,6 @@ fun getForegroundPermissionsArray(): Array<String>
     return permissions.toTypedArray()   // for a certain usage later
 }
 
-@RequiresApi(Build.VERSION_CODES.Q)
 fun getBackgroundPermissionArray(): Array<String>
 {
     val permissions = mutableListOf(
