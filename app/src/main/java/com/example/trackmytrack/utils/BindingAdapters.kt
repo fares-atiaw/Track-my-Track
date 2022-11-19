@@ -5,23 +5,18 @@ import android.widget.Button
 import androidx.databinding.BindingAdapter
 import com.example.trackmytrack.R
 
-object BindingAdapters {
-
-    @BindingAdapter("android:checkEnablement")
-    fun checkEnablement(btn: Button, flag: Boolean)
-    {
-        if(flag) {
-            btn.isEnabled = true
-            btn.text = "Enabled"
-            btn.setBackgroundColor(Color.GREEN)
-        }
-        else{
-            btn.isEnabled = false
-            btn.text = "Enable"
-            btn.setBackgroundColor(Color.parseColor("950505"))    //btn.resources.getColor(R.color.custom_red)
-        }
+@BindingAdapter("android:checkEnablement")
+fun checkIfEnabled(btn: Button, flag: Boolean)
+{
+    if(flag) {
+        btn.isEnabled = false
+        btn.text = "Enabled"
+        btn.setBackgroundColor(btn.resources.getColor(R.color.custom_green))
     }
-
-
-
+    else{
+        btn.isEnabled = true
+        btn.text = "Enable"
+        btn.setBackgroundColor(btn.resources.getColor(R.color.custom_red))    //btn.resources.getColor(R.color.custom_red)
+//        btn.setBackgroundColor(Color.parseColor("950505"))    //btn.resources.getColor(R.color.custom_red)
+    }
 }

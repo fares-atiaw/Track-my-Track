@@ -1,19 +1,25 @@
 package com.example.trackmytrack.ui
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 
 class MainViewModel : ViewModel() {
 
-    val foregroundEnabled = MutableLiveData<Boolean>(false)
-    val backgroundEnabled = MutableLiveData<Boolean>(false)
+    private var _foregroundEnabled = MutableLiveData<Boolean>(false)
+    val foregroundEnabled : LiveData<Boolean>
+        get() = _foregroundEnabled
+
+    private var _backgroundEnabled = MutableLiveData<Boolean>(false)
+    val backgroundEnabled : LiveData<Boolean>
+        get() = _backgroundEnabled
 
     fun enableForeground() {
-        foregroundEnabled.postValue(true)
+        _foregroundEnabled.postValue(true)
     }
 
     fun enableBackground() {
-        backgroundEnabled.postValue(true)
+        _backgroundEnabled.postValue(true)
     }
 
 }
