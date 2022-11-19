@@ -8,7 +8,7 @@
     <string name="app_definition">This app tracks your route throughout certain miles on the map</string>
     <string name="permissions_note">Make sure to enable the device location, \u0026 the access for the foreground \u0026 background permissions during the tracking time</string>
 
-<!--  TODO: Snakebar-->
+    <!--  TODO: Snakebar-->
     <string name="foreground_permission_required_error">Foreground permission must be granted to use the app</string>
     <string name="background_permission_required_error">Background permission must be granted to use the app</string>
     <string name="device_location_required_error">Location services must be enabled to use the app</string>
