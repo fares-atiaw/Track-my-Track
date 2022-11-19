@@ -9,11 +9,9 @@
         android:id="@+id/primerFragment"
         android:name="com.example.trackmytrack.ui.PrimerFragment"
         android:label="PrimerFragment"
-        tools:layout="@layout/fragment_primer">
-        <action
-            android:id="@+id/action_primerFragment_to_recordedLocationsFragment"
-            app:destination="@id/recordedLocationsFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_primer"
+        />
+
     <fragment
         android:id="@+id/recordedLocationsFragment"
         android:name="com.example.trackmytrack.ui.RecordedLocationsFragment"
