@@ -16,6 +16,7 @@ import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.example.trackmytrack.BuildConfig
+import com.example.trackmytrack.MainActivity
 import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
@@ -49,6 +50,11 @@ class PrimerFragment : Fragment() {
         if(requireContext().isBackgroundLocationPermissionsGranted())
             viewModel.enableBackground()
 
+        if((requireActivity() as MainActivity).sharedPreference.getBoolean(IN_ACTION_KEY, false))
+            viewModel.inAction.value = true
+
+
+        /**Views**/
         binding.btnForeground.setOnClickListener {
             if(requireContext().isForegroundLocationPermissionsGranted())
                 return@setOnClickListener
