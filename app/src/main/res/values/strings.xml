@@ -16,6 +16,7 @@
     <!--  TODO: Snakebar-->
     <string name="foreground_permission_required_error">Foreground permission must be granted to use the app</string>
     <string name="background_permission_required_error">Background permission must be granted to use the app</string>
+    <string name="both_permissions_required_error">Both foreground \u0026 background permissions must be granted during the tracking time</string>
     <string name="device_location_required_error">Location services must be enabled to use the app</string>
 
 

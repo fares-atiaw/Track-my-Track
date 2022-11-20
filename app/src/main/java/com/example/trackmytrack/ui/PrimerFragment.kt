@@ -1,5 +1,6 @@
 package com.example.trackmytrack.ui
 
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
@@ -22,7 +23,9 @@ import com.example.trackmytrack.BuildConfig
 import com.example.trackmytrack.MainActivity
 import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
+import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
+import com.example.trackmytrack.geofence.GeofenceBroadcastReceiver
 import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -84,32 +87,37 @@ class PrimerFragment : Fragment() {
             }
 
             btnStartStop.setOnClickListener {
-                Log.e("btnStartStop", "Hereee")
-                if(requireContext().isBackgroundLocationPermissionsGranted() && requireContext().isForegroundLocationPermissionsGranted())
-                {//TODO problem in button activation
-                    //TODO check device location enablement
+                if(requireContext().isBackgroundLocationPermissionsGranted() && requireContext().isForegroundLocationPermissionsGranted()) {
+                    //TODO problem in button activation
                     viewModel.allNeedsAreGranted()
 
-                    if(viewModel.inAction.value!!) {    // already running
-                        // TODO stop geofence process
-                        viewModel.inAction.value = false
-                        editor.putBoolean(IN_ACTION_KEY, false)
-                    }
-                    else {      // start a new one
-                        // TODO add current data to the ViewModel, and from there you can save the record
+                    if(viewModel.inAction.value!!) // already running
+                        stopProcesses()
+                    else // start a new one
                         checkDeviceLocationSettingsThenStartGeofence()
-                    }
+//                        startProcesses(record)
 
                     return@setOnClickListener
                 }
                 else    //TODO check device location enablement
-                    checkDeviceLocationSettingsThenStartGeofence()
+                    Snackbar.make(binding.root, R.string.both_permissions_required_error, Snackbar.LENGTH_LONG).show()
             }
         }
 
         return binding.root
     }
 
+    private fun stopProcesses() {
+        viewModel.inAction.value = false
+        editor.putBoolean(IN_ACTION_KEY, false)
+        // TODO stop geofence process
+    }
+
+    private fun startProcesses(record: Record) {
+        //TODO check device location enablement
+        // TODO add current data to the ViewModel, and from there you can save the record
+        checkDeviceLocationSettingsThenStartGeofence()
+    }
 
     private val foregroundPermissionResult = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -154,25 +162,30 @@ class PrimerFragment : Fragment() {
     }
 
     // A PendingIntent for the Broadcast Receiver that handles geofence transitions.
-    /*private val geofencePendingIntent: PendingIntent by lazy {
+    private val geofencePendingIntent: PendingIntent by lazy {
         val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        intent.action = ACTION_GEOFENCE_EVENT
-        try {
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
-        }
-        catch (_:Exception){
-            PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-        }
-    }*/
+        PendingIntent.getBroadcast(
+            context,
+            0,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+    }
 
     /**Check Device Location Settings Then Start Geofence**/
-    private fun checkDeviceLocationSettingsThenStartGeofence(resolve:Boolean = true) {
-
+    private fun checkDeviceLocationSettingsThenStartGeofence(resolve:Boolean = true)
+    {
         val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
-        if(LocationManagerCompat.isLocationEnabled(locationManager))
+        if(!LocationManagerCompat.isLocationEnabled(locationManager)){
+            Snackbar.make(binding.root, R.string.device_location_required_error, Snackbar.LENGTH_INDEFINITE)
+                .setAction(R.string.settings) {
+                    startActivity(
+                        Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                    )
+                }.show()
             return
-
+        }
+// todo customize the message dialog
         /**  1- Get some info about the device-location */
         /*val locationRequest : LocationRequest.Builder = LocationRequest.Builder(5, Priority.PRIORITY_HIGH_ACCURACY)
             .setWaitForAccurateLocation(false)
