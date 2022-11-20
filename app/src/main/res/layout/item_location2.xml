@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:elevation="8dp"
-        android:layout_marginHorizontal="12dp"
+        android:layout_marginHorizontal="8dp"
         android:layout_marginTop="2dp"
         android:layout_marginBottom="4dp"
         app:cardCornerRadius="10dp"
@@ -41,22 +41,32 @@
                 android:weightSum="2"
                 android:layout_marginVertical="2dp">
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="Time from"
-                    android:gravity="center"
                     android:layout_weight="1"
-                    android:layout_marginBottom="1dp" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="Time from"
+                        android:layout_marginBottom="1dp" />
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        tools:text="Time to"
+                        android:layout_marginTop="1dp" />
+                </LinearLayout>
 
                 <TextView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    tools:text="Time from"
-                    android:gravity="center"
+                    android:layout_height="match_parent"
+                    tools:text="location"
+                    android:gravity="end|center"
                     android:layout_weight="1"
-                    android:layout_marginBottom="1dp" />
-
+                    android:layout_marginStart="1dp" />
             </LinearLayout>
 
             <LinearLayout
@@ -71,18 +81,16 @@
                     android:layout_height="wrap_content"
                     tools:text="latitude"
                     android:layout_weight="1"
-                    android:textColor="#555454"
-                    android:gravity="end"
-                    android:layout_marginEnd="1dp"/>
+                    android:textColor="#444"
+                    android:gravity="center" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:text="longitude"
                     android:layout_weight="1"
-                    android:textColor="#555454"
-                    android:gravity="start"
-                    android:layout_marginStart="1dp"/>
+                    android:textColor="#444"
+                    android:gravity="center" />
             </LinearLayout>
 
         </LinearLayout>

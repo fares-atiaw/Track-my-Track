@@ -90,7 +90,7 @@
                     android:layout_width="0dp"
                     android:layout_height="40dp"
                     android:layout_marginHorizontal="8dp"
-                    android:text="Enable"
+                    android:text="@string/not_enabled"
                     android:checkEnablement="@{data.foregroundEnabled}"
                     android:textSize="14sp"
                     android:textAllCaps="false"
@@ -120,7 +120,7 @@
                     android:layout_height="40dp"
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="8dp"
-                    android:text="Enable"
+                    android:text="@string/not_enabled"
                     android:checkEnablement="@{data.backgroundEnabled}"
                     android:textSize="14sp"
                     android:textAllCaps="false"
@@ -131,16 +131,32 @@
             </LinearLayout>
 
             <Button
-                android:id="@+id/btn_start_stop"
+                android:id="@+id/btn_see_list"
                 android:background="@drawable/round_style"
-                android:backgroundTint="#009688"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginHorizontal="16dp"
-                android:layout_marginVertical="32dp"
+                android:layout_marginTop="32dp"
                 android:padding="10dp"
-                android:text="Start Track"
+                android:text="@string/see_your_track"
+                android:checkForAction="@{data.allGranted}"
+                android:textSize="26sp"
+                android:textAllCaps="false"
+                android:textColor="@color/white"
+                android:letterSpacing="0.05"
+                />
+
+            <Button
+                android:id="@+id/btn_start_stop"
+                android:backgroundTint="#0E2E01"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginHorizontal="16dp"
+                android:layout_marginVertical="16dp"
+                android:padding="10dp"
+                android:text="@string/start_track"
                 android:checkForAction="@{data.allGranted}"
                 android:textSize="26sp"
                 android:textAllCaps="false"
@@ -149,6 +165,7 @@
                 />
 
         </LinearLayout>
+
     </ScrollView>
 
 </layout>

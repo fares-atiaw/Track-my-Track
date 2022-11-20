@@ -1,10 +1,12 @@
 package com.example.trackmytrack.repository
 
+import androidx.lifecycle.LiveData
 import com.example.trackmytrack.data.Record
-import com.example.trackmytrack.utils.ActualResult
+import com.example.trackmytrack.utils.Response
 
 interface DefaultRepository {
-    suspend fun getRecords(): ActualResult<List<Record>>
+    fun getRecords(): Response<LiveData<List<Record>>>
     suspend fun saveRecord(record: Record)
+    suspend fun updateRecord(record: Record)
     suspend fun deleteAllRecords()
 }

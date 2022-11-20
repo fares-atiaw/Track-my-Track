@@ -1,11 +1,9 @@
 package com.example.trackmytrack.ui
 
-import android.app.Application
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
+import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.repository.DefaultRepository
+import kotlinx.coroutines.launch
 
 class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
 
@@ -22,6 +20,8 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
     val allGranted : LiveData<Boolean>
         get() = _allGranted
 
+    var inAction = MutableLiveData<Boolean>(false)
+
     /**related methods**/
     fun enableForeground() {
         _foregroundEnabled.postValue(true)
@@ -34,15 +34,42 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
     fun allNeedsAreGranted() {
         _allGranted.postValue(true)
     }
+
 //    fun disableStartStop() {
 //        _allGranted.postValue(false)
 //    }
 
+
     /**variables**/
     // todo get required record's needs
+    val trackRecordsList : LiveData<List<Record>>?
+        get() = repo.getRecords().data
 
+    val date = MutableLiveData<String?>()
+    val place = MutableLiveData<String?>()
+    val timeFrom = MutableLiveData<String?>()
+    val timeTo = MutableLiveData<String?>()
+    val latitude = MutableLiveData<Double?>()
+    val longitude = MutableLiveData<Double?>()
+
+
+    //System.currentTimeMillis()
 
     /**related methods**/
+    fun saveRecord(dataRecord: Record) {
+        viewModelScope.launch {
+            repo.saveRecord(
+                Record(
+                    dataRecord.date,
+                    dataRecord.place,
+                    dataRecord.timeFrom,
+                    dataRecord.timeTo,
+                    dataRecord.latitude,
+                    dataRecord.longitude
+                )
+            )
+        }
+    }
 
 
 

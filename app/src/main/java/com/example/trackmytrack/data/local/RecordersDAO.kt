@@ -1,9 +1,7 @@
 package com.example.trackmytrack.data.local
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.lifecycle.LiveData
+import androidx.room.*
 import com.example.trackmytrack.data.Record
 
 @Dao
@@ -11,11 +9,15 @@ interface RecordersDAO {
 
     // Get all records.
     @Query("SELECT * FROM location_record_table")
-    suspend fun getRecords(): List<Record>
+    fun getRecords(): LiveData<List<Record>>
 
-    // Adding a record
+    // Add record
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun saveRecord(record: Record)
+
+    // Update time_to of record
+    @Update
+    suspend fun upsertRecord(data: Record)
 
     // Delete all records.
     @Query("DELETE FROM location_record_table")

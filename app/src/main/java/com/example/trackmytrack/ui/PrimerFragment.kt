@@ -1,12 +1,9 @@
 package com.example.trackmytrack.ui
 
-import android.app.TaskStackBuilder.create
 import android.content.Context
 import android.content.Intent
-import android.content.IntentSender
 import android.content.IntentSender.SendIntentException
 import android.location.LocationManager
-import android.location.LocationRequest
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
@@ -18,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.example.trackmytrack.BuildConfig
 import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
@@ -26,18 +22,16 @@ import com.example.trackmytrack.databinding.FragmentPrimerBinding
 import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
-import com.google.android.gms.location.LocationRequest.PRIORITY_LOW_POWER
-import com.google.android.gms.location.LocationRequest.create
-import com.google.android.gms.location.Priority.PRIORITY_LOW_POWER
 import com.google.android.material.snackbar.Snackbar
 
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
 //    val viewModel: MainViewModel by viewModels({ requireActivity() })
-    val viewModel by activityViewModels<MainViewModel> { MainViewModel.MainViewModelFactory(
-            (requireContext().applicationContext as MyApp).repository
-        )
+    val viewModel by activityViewModels<MainViewModel> {
+    MainViewModel.MainViewModelFactory(
+        (requireContext().applicationContext as MyApp).repository
+    )
     }
     private lateinit var binding : FragmentPrimerBinding
 
@@ -79,6 +73,9 @@ class PrimerFragment : Fragment() {
                 viewModel.allNeedsAreGranted()
                 Log.e("btnStartStop", "Hereee2")
                 checkDeviceLocationSettingsThenStartGeofence()
+
+//      todo          viewModel.inAction.postValue(true)        +       shared preferences
+
                 return@setOnClickListener
             }
             else    //TODO check device location enablement

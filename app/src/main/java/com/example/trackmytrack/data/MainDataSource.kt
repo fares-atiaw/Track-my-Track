@@ -1,10 +1,12 @@
 package com.example.trackmytrack.data
 
-import com.example.trackmytrack.utils.ActualResult
+import androidx.lifecycle.LiveData
+import com.example.trackmytrack.utils.Response
 
 interface MainDataSource {
 
-    suspend fun getRecords(): ActualResult<List<Record>>
+    fun getRecords(): Response<LiveData<List<Record>>>
     suspend fun saveRecord(record: Record)
+    suspend fun updateRecord(record: Record)
     suspend fun deleteAllRecords()
 }

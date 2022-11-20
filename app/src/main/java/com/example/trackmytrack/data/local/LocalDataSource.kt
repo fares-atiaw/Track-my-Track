@@ -1,26 +1,32 @@
 package com.example.trackmytrack.data.local
 
+import androidx.lifecycle.LiveData
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.data.MainDataSource
-import com.example.trackmytrack.utils.ActualResult
+import com.example.trackmytrack.utils.Response
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class LocalDataSource(private val recordDatabaseDao: RecordersDAO) : MainDataSource {
 
-    override suspend fun getRecords(): ActualResult<List<Record>> =
-        withContext(Dispatchers.IO) {
-        return@withContext try {
-            ActualResult.Success(recordDatabaseDao.getRecords())
+    override fun getRecords(): Response<LiveData<List<Record>>> {
+        return try {
+            Response.Success(recordDatabaseDao.getRecords())
         }
         catch (e: Exception) {
-            ActualResult.Error(e.message ?: "Nothing to say")
+            Response.Error(e.message ?: "Nothing to say")
         }
     }
 
     override suspend fun saveRecord(record: Record) {
         withContext(Dispatchers.IO) {
             recordDatabaseDao.saveRecord(record)
+        }
+    }
+
+    override suspend fun updateRecord(record: Record) {
+        withContext(Dispatchers.IO) {
+            recordDatabaseDao.upsertRecord(record)
         }
     }
 
