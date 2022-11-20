@@ -17,8 +17,10 @@ import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.example.trackmytrack.BuildConfig
+import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
 import com.example.trackmytrack.utils.*
@@ -32,7 +34,11 @@ import com.google.android.material.snackbar.Snackbar
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
-    val viewModel: MainViewModel by viewModels({ requireActivity() })
+//    val viewModel: MainViewModel by viewModels({ requireActivity() })
+    val viewModel by activityViewModels<MainViewModel> { MainViewModel.MainViewModelFactory(
+            (requireContext().applicationContext as MyApp).repository
+        )
+    }
     private lateinit var binding : FragmentPrimerBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
