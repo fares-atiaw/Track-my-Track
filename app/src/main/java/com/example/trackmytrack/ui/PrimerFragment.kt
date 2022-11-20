@@ -55,37 +55,43 @@ class PrimerFragment : Fragment() {
 
 
         /**Views**/
-        binding.btnForeground.setOnClickListener {
-            if(requireContext().isForegroundLocationPermissionsGranted())
-                return@setOnClickListener
+        binding.apply {
 
-            foregroundPermissionResult.launch(getForegroundPermissionsArray())
-        }
+            btnForeground.setOnClickListener {
+                if(requireContext().isForegroundLocationPermissionsGranted())
+                    return@setOnClickListener
 
-        binding.btnBackground.setOnClickListener {
-            if(requireContext().isBackgroundLocationPermissionsGranted()){
-                viewModel.enableBackground()
-                return@setOnClickListener
+                foregroundPermissionResult.launch(getForegroundPermissionsArray())
             }
-            backgroundPermissionResult.launch(getBackgroundPermissionArray())
-        }
 
-        binding.btnStartStop.setOnClickListener {
-            Log.e("btnStartStop", "Hereee")
-            if(requireContext().isBackgroundLocationPermissionsGranted() && requireContext().isForegroundLocationPermissionsGranted())
-            {//TODO problem in button activation
-            //TODO check device location enablement
-                Log.e("btnStartStop", "Hereee1")
-                viewModel.allNeedsAreGranted()
-                Log.e("btnStartStop", "Hereee2")
-                checkDeviceLocationSettingsThenStartGeofence()
-
-//      todo          viewModel.inAction.postValue(true)        +       shared preferences
-
-                return@setOnClickListener
+            btnBackground.setOnClickListener {
+                if(requireContext().isBackgroundLocationPermissionsGranted()){
+                    viewModel.enableBackground()
+                    return@setOnClickListener
+                }
+                backgroundPermissionResult.launch(getBackgroundPermissionArray())
             }
-            else    //TODO check device location enablement
-                checkDeviceLocationSettingsThenStartGeofence()
+
+            btnStartStop.setOnClickListener {
+                Log.e("btnStartStop", "Hereee")
+                if(requireContext().isBackgroundLocationPermissionsGranted() && requireContext().isForegroundLocationPermissionsGranted())
+                {//TODO problem in button activation
+                    //TODO check device location enablement
+                    viewModel.allNeedsAreGranted()
+                    checkDeviceLocationSettingsThenStartGeofence()
+
+                    if(viewModel.inAction.value!!) {
+                        // TODO stop geofence process
+                    }
+                    else {
+
+                    }
+
+                    return@setOnClickListener
+                }
+                else    //TODO check device location enablement
+                    checkDeviceLocationSettingsThenStartGeofence()
+            }
         }
 
         return binding.root
