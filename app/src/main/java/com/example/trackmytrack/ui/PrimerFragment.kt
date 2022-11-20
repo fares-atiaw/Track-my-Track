@@ -79,6 +79,10 @@ class PrimerFragment : Fragment() {
                 backgroundPermissionResult.launch(getBackgroundPermissionArray())
             }
 
+            btnSeeList.setOnClickListener {
+                findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
+            }
+
             btnStartStop.setOnClickListener {
                 Log.e("btnStartStop", "Hereee")
                 if(requireContext().isBackgroundLocationPermissionsGranted() && requireContext().isForegroundLocationPermissionsGranted())
@@ -92,10 +96,8 @@ class PrimerFragment : Fragment() {
                         editor.putBoolean(IN_ACTION_KEY, false)
                     }
                     else {      // start a new one
+                        // TODO add current data to the ViewModel, and from there you can save the record
                         checkDeviceLocationSettingsThenStartGeofence()
-                        viewModel.inAction.value = true
-                        editor.putBoolean(IN_ACTION_KEY, true)
-                        findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
                     }
 
                     return@setOnClickListener
@@ -210,8 +212,10 @@ class PrimerFragment : Fragment() {
         /**  3- Check the device-location => If it is enabled, do ✅  */
         locationSettingsResponseTask.addOnCompleteListener {
             if ( it.isSuccessful ) {
-                Log.e(TAG, "Heree")
+                Log.e(TAG, "isSuccessful")
                 // todo addGeofence(reminderData, _viewModel.circularRadius.value ?: 100f)
+                viewModel.inAction.value = true
+                editor.putBoolean(IN_ACTION_KEY, true)
             }
         }
     }

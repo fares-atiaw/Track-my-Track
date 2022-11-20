@@ -1,5 +1,6 @@
 package com.example.trackmytrack.utils
 
+import android.graphics.Color
 import android.view.View
 import android.widget.Button
 import androidx.databinding.BindingAdapter
@@ -33,10 +34,14 @@ fun checkForActions(btn: Button, flag: Boolean)
 @BindingAdapter("android:checkToStartOrToStop")
 fun checkToStartOrToStop(btn: Button, flag: Boolean)
 {
-    if(flag)
+    if(flag) {
         btn.text = btn.resources.getString(R.string.stop_track)
-    else
+        btn.setBackgroundColor(btn.resources.getColor(R.color.dark_red))
+    }
+    else {
         btn.text = btn.resources.getString(R.string.start_track)
+        btn.setBackgroundColor(btn.resources.getColor(R.color.dark_green))
+    }
 }
 
 @BindingAdapter("android:ableToSeeTracks")
