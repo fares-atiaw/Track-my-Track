@@ -10,11 +10,21 @@
         android:name="com.example.trackmytrack.ui.PrimerFragment"
         android:label="PrimerFragment"
         tools:layout="@layout/fragment_primer"
-        />
+        >
+        <action
+            android:id="@+id/action_primerFragment_to_recordedLocationsFragment"
+            app:destination="@id/recordedLocationsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/recordedLocationsFragment"
         android:name="com.example.trackmytrack.ui.RecordedLocationsFragment"
         android:label="fragment_recorded_locations"
-        tools:layout="@layout/fragment_recorded_locations" />
+        tools:layout="@layout/fragment_recorded_locations" >
+        <action
+            android:id="@+id/action_recordedLocationsFragment_to_primerFragment"
+            app:destination="@id/primerFragment"
+            app:popUpToInclusive="true" />
+    </fragment>
+
 </navigation>

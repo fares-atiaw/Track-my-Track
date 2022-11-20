@@ -3,6 +3,7 @@ package com.example.trackmytrack.ui
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
+import android.content.SharedPreferences
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -12,9 +13,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.trackmytrack.BuildConfig
 import com.example.trackmytrack.MainActivity
 import com.example.trackmytrack.MyApp
@@ -30,11 +33,13 @@ class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
 //    val viewModel: MainViewModel by viewModels({ requireActivity() })
     val viewModel by activityViewModels<MainViewModel> {
-    MainViewModel.MainViewModelFactory(
-        (requireContext().applicationContext as MyApp).repository
-    )
+        MainViewModel.MainViewModelFactory(
+            (requireContext().applicationContext as MyApp).repository
+        )
     }
     private lateinit var binding : FragmentPrimerBinding
+    lateinit var sharedPreference: SharedPreferences
+    lateinit var editor: SharedPreferences.Editor
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         // Inflate the layout for this fragment
@@ -42,6 +47,8 @@ class PrimerFragment : Fragment() {
 
         binding.data = viewModel
         binding.lifecycleOwner = this
+        sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
+        editor = sharedPreference.edit()
 
         /**Check at first**/
         if(requireContext().isForegroundLocationPermissionsGranted())
@@ -78,13 +85,17 @@ class PrimerFragment : Fragment() {
                 {//TODO problem in button activation
                     //TODO check device location enablement
                     viewModel.allNeedsAreGranted()
-                    checkDeviceLocationSettingsThenStartGeofence()
 
-                    if(viewModel.inAction.value!!) {
+                    if(viewModel.inAction.value!!) {    // already running
                         // TODO stop geofence process
+                        viewModel.inAction.value = false
+                        editor.putBoolean(IN_ACTION_KEY, false)
                     }
-                    else {
-
+                    else {      // start a new one
+                        checkDeviceLocationSettingsThenStartGeofence()
+                        viewModel.inAction.value = true
+                        editor.putBoolean(IN_ACTION_KEY, true)
+                        findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
                     }
 
                     return@setOnClickListener

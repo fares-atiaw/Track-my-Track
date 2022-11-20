@@ -1,6 +1,5 @@
 package com.example.trackmytrack.utils
 
-import android.graphics.Color
 import android.view.View
 import android.widget.Button
 import androidx.databinding.BindingAdapter
