@@ -1,6 +1,6 @@
 package com.example.trackmytrack.ui
 
-import android.app.PendingIntent
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.IntentSender.SendIntentException
@@ -25,7 +25,6 @@ import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
-import com.example.trackmytrack.geofence.GeofenceBroadcastReceiver
 import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -44,12 +43,9 @@ class PrimerFragment : Fragment() {
     lateinit var sharedPreference: SharedPreferences
     lateinit var editor: SharedPreferences.Editor
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        // Inflate the layout for this fragment
-        binding = FragmentPrimerBinding.inflate(inflater, container, false)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
-        binding.data = viewModel
-        binding.lifecycleOwner = this
         sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
 
@@ -59,10 +55,17 @@ class PrimerFragment : Fragment() {
 
         if(requireContext().isBackgroundLocationPermissionsGranted())
             viewModel.enableBackground()
+    }
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+        // Inflate the layout for this fragment
+        binding = FragmentPrimerBinding.inflate(inflater, container, false)
+
+        binding.data = viewModel
+        binding.lifecycleOwner = this
 
         if((requireActivity() as MainActivity).sharedPreference.getBoolean(IN_ACTION_KEY, false))
             viewModel.inAction.value = true
-
 
         /**Views**/
         binding.apply {
@@ -161,50 +164,32 @@ class PrimerFragment : Fragment() {
         }
     }
 
-    // A PendingIntent for the Broadcast Receiver that handles geofence transitions.
-    private val geofencePendingIntent: PendingIntent by lazy {
-        val intent = Intent(context, GeofenceBroadcastReceiver::class.java)
-        PendingIntent.getBroadcast(
-            context,
-            0,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-    }
-
     /**Check Device Location Settings Then Start Geofence**/
-    private fun checkDeviceLocationSettingsThenStartGeofence(resolve:Boolean = true)
+    private fun checkDeviceLocationSettingsThenStartGeofence()
     {
+        /**  At first  **/
         val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if(!LocationManagerCompat.isLocationEnabled(locationManager)){
-            Snackbar.make(binding.root, R.string.device_location_required_error, Snackbar.LENGTH_INDEFINITE)
-                .setAction(R.string.settings) {
-                    startActivity(
-                        Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-                    )
-                }.show()
+        if(LocationManagerCompat.isLocationEnabled(locationManager)){
+            // todo get the required needs
+            viewModel.inAction.value = true
+            editor.putBoolean(IN_ACTION_KEY, true)
+
             return
         }
-// todo customize the message dialog
-        /**  1- Get some info about the device-location */
-        /*val locationRequest : LocationRequest.Builder = LocationRequest.Builder(5, Priority.PRIORITY_HIGH_ACCURACY)
-            .setWaitForAccurateLocation(false)
-            .setMinUpdateIntervalMillis(locationFastestInterval)
-            .setMaxUpdateDelayMillis(locationMaxWaitTime)
-            .build()*/
-        val locationRequest = com.google.android.gms.location.LocationRequest.create().apply {
-            interval = 100
-            fastestInterval = 50
-            priority = Priority.PRIORITY_HIGH_ACCURACY
-            maxWaitTime = 100
-        }
-        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
-        val settingsClient = LocationServices.getSettingsClient(requireActivity())
-        val locationSettingsResponseTask = settingsClient.checkLocationSettings(builder.build())
 
-        /**  2- Check the device-location => If it is disabled, do a loop (dialog ⇄ snakebar) */
-        locationSettingsResponseTask.addOnFailureListener { exception ->
-            if (exception is ResolvableApiException && resolve){
+        /**  1- Get some info about the device-location */
+        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            .setWaitForAccurateLocation(false)
+            .setMinUpdateIntervalMillis(500)
+            .setMaxUpdateDelayMillis(1000)
+            .build()
+        val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest).setAlwaysShow(true)
+        val settingsClient = LocationServices.getSettingsClient(requireContext())
+        val locationSettingsResponse = settingsClient.checkLocationSettings(builder.build())
+
+        /**  2- Check the device-location => If it is disabled, show a snakebar */
+        locationSettingsResponse.addOnFailureListener { exception ->
+            if (exception is ResolvableApiException){
                 // Location settings are not satisfied, but this can be fixed by showing the user a dialog.
                 try {
                     // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
@@ -223,10 +208,10 @@ class PrimerFragment : Fragment() {
         }
 
         /**  3- Check the device-location => If it is enabled, do ✅  */
-        locationSettingsResponseTask.addOnCompleteListener {
+        locationSettingsResponse.addOnCompleteListener {
             if ( it.isSuccessful ) {
                 Log.e(TAG, "isSuccessful")
-                // todo addGeofence(reminderData, _viewModel.circularRadius.value ?: 100f)
+                // todo get the required needs
                 viewModel.inAction.value = true
                 editor.putBoolean(IN_ACTION_KEY, true)
             }
@@ -235,9 +220,85 @@ class PrimerFragment : Fragment() {
 
     // When we get the result from asking the user to turn on device location,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
-            checkDeviceLocationSettingsThenStartGeofence(false)
-        }
-    }
+        super.onActivityResult(requestCode, resultCode, data)
 
+        if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
+            when (resultCode) {
+                Activity.RESULT_OK ->
+                    checkDeviceLocationSettingsThenStartGeofence()
+                Activity.RESULT_CANCELED ->
+                    Snackbar.make(binding.root, R.string.device_location_required_error, Snackbar.LENGTH_SHORT).show()
+            }
+        }
+// Toast.makeText(requireContext(), "GPS is turned on", Toast.LENGTH_SHORT).show()
+    }
 }
+
+
+
+
+
+
+/*LocationServices.getSettingsClient(requireActivity())
+    .checkLocationSettings(locationRequestBuilder.build())
+    .addOnCompleteListener {
+        try {
+            it.getResult(ApiException::class.java)
+            // Location settings are On
+        } catch (exception: ApiException) { // Location settings are Off
+            when (exception.statusCode) {
+                RESOLUTION_REQUIRED -> try { // Check result in onActivityResult
+                    val resolvable = exception as ResolvableApiException
+                    resolvable.startResolutionForResult(requireActivity(), LOCATION_REQUEST_CODE)
+                } catch (ignored: IntentSender.SendIntentException) {
+                } catch (ignored: ClassCastException) {
+                }
+                // Location settings are not available on device
+            }
+        }
+    }*/
+
+/**  1- Get some info about the device-location */
+/*val locationRequest : LocationRequest.Builder = LocationRequest.Builder(5, Priority.PRIORITY_HIGH_ACCURACY)
+    .setWaitForAccurateLocation(false)
+    .setMinUpdateIntervalMillis(locationFastestInterval)
+    .setMaxUpdateDelayMillis(locationMaxWaitTime)
+    .build()*/
+/*val locationRequest = LocationRequest.create().apply {
+    interval = 100
+    fastestInterval = 50
+    priority = Priority.PRIORITY_HIGH_ACCURACY
+    maxWaitTime = 100
+}
+val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest)
+val settingsClient = LocationServices.getSettingsClient(requireActivity())
+val locationSettingsResponseTask = settingsClient.checkLocationSettings(builder.build())*/
+
+/**  2- Check the device-location => If it is disabled, do a loop (dialog ⇄ snakebar) */
+/*locationSettingsResponseTask.addOnFailureListener { exception ->
+    if (exception is ResolvableApiException && resolve){
+        // Location settings are not satisfied, but this can be fixed by showing the user a dialog.
+        try {
+            // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
+            startIntentSenderForResult(exception.resolution.intentSender, REQUEST_TURN_DEVICE_LOCATION_ON, null, 0,0,0, null)        // can work
+        }
+        catch (sendEx: SendIntentException) {
+            Log.d(TAG, "Error getting location settings resolution: " + sendEx.message)
+        }
+    } else
+        Snackbar.make(binding.root, R.string.device_location_required_error, Snackbar.LENGTH_INDEFINITE)
+            .setAction(R.string.enable) {
+                startActivity(
+                    Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+                )
+            }.show()
+}
+
+/**  3- Check the device-location => If it is enabled, do ✅  */
+locationSettingsResponseTask.addOnCompleteListener {
+    if ( it.isSuccessful ) {
+        Log.e(TAG, "isSuccessful")
+        viewModel.inAction.value = true
+        editor.putBoolean(IN_ACTION_KEY, true)
+    }
+}*/
