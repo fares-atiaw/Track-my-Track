@@ -7,26 +7,27 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
+import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
+import com.example.trackmytrack.data.Record
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.Marker
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 
 class MapFragment : Fragment(), OnMapReadyCallback {
     private val TAG = MapFragment::class.java.simpleName
     private lateinit var map: GoogleMap
     private var marker: Marker? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    val viewModel by activityViewModels<MainViewModel> {
+        MainViewModel.MainViewModelFactory(
+            (requireContext().applicationContext as MyApp).repository
+        )
     }
+    lateinit var lista : List<Record>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -38,6 +39,11 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         val mapFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment?
         mapFragment?.getMapAsync(this)
+
+        viewModel.allTrackRecordsList.data?.observe(viewLifecycleOwner) { result ->
+            Log.e("3rd Fragment", result.toString())
+            lista = result
+        }
 
         /**Menu Setup**/
         val menuHost: MenuHost = requireActivity()
@@ -70,11 +76,22 @@ class MapFragment : Fragment(), OnMapReadyCallback {
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
-        val myHome = LatLng(29.975507526586643, 31.40644697381402)
+        val currentLocation = lista[lista.size-1]
+        val myHome = LatLng(currentLocation.latitude!!, currentLocation.longitude!!)
+
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myHome, 25f))
 
         map = googleMap.apply {
-            addMarker(MarkerOptions().position(myHome).title("Marker at there :)"))
-            moveCamera(CameraUpdateFactory.newLatLngZoom(myHome, 16f))
+            for (loc in lista) {
+                val place = LatLng(loc.latitude!!, loc.longitude!!)
+                marker = addMarker(MarkerOptions()
+                    .position(place)
+                    .title(loc.time)
+                    .alpha(0.4f)
+                    .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
+                )
+                marker?.showInfoWindow()
+            }
         }
 
         setMapStyle(map)
