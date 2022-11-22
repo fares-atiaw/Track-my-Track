@@ -5,7 +5,7 @@ import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.repository.DefaultRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
+class MainViewModel( val repo : DefaultRepository) : ViewModel() {
 
     /**variables**/
     private var _foregroundEnabled = MutableLiveData<Boolean>(false)
@@ -58,19 +58,17 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
     /**related methods**/
     fun saveRecord(dataRecord: Record) {
         viewModelScope.launch {
-            repo.saveRecord(
-                Record(
+            repo.saveRecord(dataRecord)
+        }
+    }
+/*Record(
                     dataRecord.date,
                     dataRecord.place,
                     dataRecord.timeFrom,
                     dataRecord.timeTo,
                     dataRecord.latitude,
                     dataRecord.longitude
-                )
-            )
-        }
-    }
-
+                )*/
 
 
 

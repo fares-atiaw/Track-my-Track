@@ -1,10 +1,11 @@
 package com.example.trackmytrack.ui
 
+import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
+import android.app.DownloadManager
+import android.app.PendingIntent
+import android.content.*
 import android.content.IntentSender.SendIntentException
-import android.content.SharedPreferences
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
@@ -18,10 +19,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import com.example.trackmytrack.BuildConfig
-import com.example.trackmytrack.MainActivity
-import com.example.trackmytrack.MyApp
+import androidx.work.*
+import com.example.trackmytrack.*
 import com.example.trackmytrack.R
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
@@ -29,6 +30,7 @@ import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.launch
 
 
 class PrimerFragment : Fragment() {
@@ -42,12 +44,17 @@ class PrimerFragment : Fragment() {
     private lateinit var binding : FragmentPrimerBinding
     lateinit var sharedPreference: SharedPreferences
     lateinit var editor: SharedPreferences.Editor
+    lateinit var locationManager: LocationManager
+    val locationPermissionCode = 2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
         sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
+
 
         /**Check at first**/
         if(requireContext().isForegroundLocationPermissionsGranted())
@@ -62,9 +69,9 @@ class PrimerFragment : Fragment() {
         binding = FragmentPrimerBinding.inflate(inflater, container, false)
 
         binding.data = viewModel
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
 
-        if((requireActivity() as MainActivity).sharedPreference.getBoolean(IN_ACTION_KEY, false))
+        if((requireActivity() as MainActivity).sharedPreference.getBoolean(KEY_IN_ACTION, false))
             viewModel.inAction.value = true
 
         /**Views**/
@@ -97,12 +104,9 @@ class PrimerFragment : Fragment() {
                     if(viewModel.inAction.value!!) // already running
                         stopProcesses()
                     else // start a new one
-                        checkDeviceLocationSettingsThenStartGeofence()
-//                        startProcesses(record)
-
-                    return@setOnClickListener
+                        startProcesses()
                 }
-                else    //TODO check device location enablement
+                else
                     Snackbar.make(binding.root, R.string.both_permissions_required_error, Snackbar.LENGTH_LONG).show()
             }
         }
@@ -112,16 +116,22 @@ class PrimerFragment : Fragment() {
 
     private fun stopProcesses() {
         viewModel.inAction.value = false
-        editor.putBoolean(IN_ACTION_KEY, false)
-        // TODO stop geofence process
+        editor.putBoolean(KEY_IN_ACTION, false)
+
+        // TODO show dialog with the meters
     }
 
-    private fun startProcesses(record: Record) {
-        //TODO check device location enablement
-        // TODO add current data to the ViewModel, and from there you can save the record
-        checkDeviceLocationSettingsThenStartGeofence()
+    @SuppressLint("MissingPermission")
+    private fun startProcesses() {
+        if(checkDeviceLocationSettingsThenStartWork()) {
+            viewModel.inAction.value = true
+            editor.putBoolean(KEY_IN_ACTION, true)
+
+        }
     }
 
+
+/**Control permissions**/
     private val foregroundPermissionResult = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { permissions ->
@@ -164,18 +174,13 @@ class PrimerFragment : Fragment() {
         }
     }
 
-    /**Check Device Location Settings Then Start Geofence**/
-    private fun checkDeviceLocationSettingsThenStartGeofence()
+
+/**Check Device Location Settings Then Start Geofence**/
+    private fun checkDeviceLocationSettingsThenStartWork() : Boolean
     {
         /**  At first  **/
-        val locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        if(LocationManagerCompat.isLocationEnabled(locationManager)){
-            // todo get the required needs
-            viewModel.inAction.value = true
-            editor.putBoolean(IN_ACTION_KEY, true)
-
-            return
-        }
+        if(LocationManagerCompat.isLocationEnabled(locationManager))
+            return true
 
         /**  1- Get some info about the device-location */
         val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
@@ -187,12 +192,12 @@ class PrimerFragment : Fragment() {
         val settingsClient = LocationServices.getSettingsClient(requireContext())
         val locationSettingsResponse = settingsClient.checkLocationSettings(builder.build())
 
-        /**  2- Check the device-location => If it is disabled, show a snakebar */
+        /**  2- Check the device-location => If it is disabled, show a snakebar and return false */
+        var flag = false
         locationSettingsResponse.addOnFailureListener { exception ->
             if (exception is ResolvableApiException){
                 // Location settings are not satisfied, but this can be fixed by showing the user a dialog.
                 try {
-                    // Show the dialog by calling startResolutionForResult(), and check the result in onActivityResult().
                     startIntentSenderForResult(exception.resolution.intentSender, REQUEST_TURN_DEVICE_LOCATION_ON, null, 0,0,0, null)        // can work
                 }
                 catch (sendEx: SendIntentException) {
@@ -205,18 +210,18 @@ class PrimerFragment : Fragment() {
                             Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
                         )
                     }.show()
+            flag = false
         }
 
-        /**  3- Check the device-location => If it is enabled, do ✅  */
+        /**  3- Check the device-location => If it is enabled, return true */
         locationSettingsResponse.addOnCompleteListener {
-            if ( it.isSuccessful ) {
-                Log.e(TAG, "isSuccessful")
-                // todo get the required needs
-                viewModel.inAction.value = true
-                editor.putBoolean(IN_ACTION_KEY, true)
-            }
+            if ( it.isSuccessful )
+                flag = true
         }
+
+        return flag
     }
+
 
     // When we get the result from asking the user to turn on device location,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -225,7 +230,7 @@ class PrimerFragment : Fragment() {
         if (requestCode == REQUEST_TURN_DEVICE_LOCATION_ON) {
             when (resultCode) {
                 Activity.RESULT_OK ->
-                    checkDeviceLocationSettingsThenStartGeofence()
+                    checkDeviceLocationSettingsThenStartWork()
                 Activity.RESULT_CANCELED ->
                     Snackbar.make(binding.root, R.string.device_location_required_error, Snackbar.LENGTH_SHORT).show()
             }
