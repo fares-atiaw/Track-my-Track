@@ -25,6 +25,14 @@
             android:id="@+id/action_recordedLocationsFragment_to_primerFragment"
             app:destination="@id/primerFragment"
             app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_recordedLocationsFragment_to_mapFragment"
+            app:destination="@id/mapFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.trackmytrack.ui.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" />
 
 </navigation>

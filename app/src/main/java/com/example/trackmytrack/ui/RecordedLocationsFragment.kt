@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.R
 import com.example.trackmytrack.adapter.RecordsAdapter
@@ -34,13 +35,15 @@ class RecordedLocationsFragment : Fragment(R.layout.fragment_recorded_locations)
             adapter.submitList(result)
         }
 
+        binding.fabMap.setOnClickListener{
+            findNavController().navigate(R.id.action_recordedLocationsFragment_to_mapFragment)
+        }
 
         return binding.root
     }
 
     private fun setupRecyclerView() {
         binding.rvLocations.adapter = adapter
-        binding.rvLocations.setHasFixedSize(true)
     }
 
 

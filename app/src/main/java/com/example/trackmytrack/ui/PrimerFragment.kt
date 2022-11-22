@@ -103,7 +103,7 @@ class PrimerFragment : Fragment() {
             }
 
             btnSeeList.setOnClickListener {
-                    findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
+                findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
             }
 
             btnStartStop.setOnClickListener {
@@ -128,10 +128,9 @@ class PrimerFragment : Fragment() {
         viewModel.inAction.value = false
         editor.putBoolean(KEY_IN_ACTION, false)
 
-        lifecycleScope.launch {
-            requireContext().stopService(intent)
-            requireActivity().unregisterReceiver(receiver)
-        }
+        requireContext().stopService(intent)
+        requireActivity().unregisterReceiver(receiver)
+
         viewModel.clearRecords()
         // TODO show dialog with the meters
     }
@@ -142,10 +141,8 @@ class PrimerFragment : Fragment() {
             viewModel.inAction.value = true
             editor.putBoolean(KEY_IN_ACTION, true)
 
-            lifecycleScope.launch {
-                requireContext().startService(intent)
-                requireActivity().registerReceiver(receiver, IntentFilter("location_update"))
-            }
+            requireContext().startService(intent)
+            requireActivity().registerReceiver(receiver, IntentFilter("location_update"))
         }
     }
 
