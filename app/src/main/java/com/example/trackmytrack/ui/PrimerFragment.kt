@@ -26,6 +26,7 @@ import com.example.trackmytrack.*
 import com.example.trackmytrack.R
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
+import com.example.trackmytrack.service.RecordingService
 import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
@@ -46,6 +47,7 @@ class PrimerFragment : Fragment() {
     lateinit var editor: SharedPreferences.Editor
     lateinit var locationManager: LocationManager
     val locationPermissionCode = 2
+    lateinit var intent : Intent
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +57,7 @@ class PrimerFragment : Fragment() {
         sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
 
+        intent = Intent(context, RecordingService::class.java)
 
         /**Check at first**/
         if(requireContext().isForegroundLocationPermissionsGranted())
@@ -118,12 +121,10 @@ class PrimerFragment : Fragment() {
         viewModel.inAction.value = false
         editor.putBoolean(KEY_IN_ACTION, false)
 
-        cancelRecurringWork()
+        lifecycleScope.launch {
+            requireContext().stopService(intent)
+        }
         // TODO show dialog with the meters
-    }
-
-    private fun cancelRecurringWork() {
-        WorkManager.getInstance(requireContext()).cancelUniqueWork(WORK_NAME)
     }
 
     @SuppressLint("MissingPermission")
@@ -132,17 +133,12 @@ class PrimerFragment : Fragment() {
             viewModel.inAction.value = true
             editor.putBoolean(KEY_IN_ACTION, true)
 
-            startRecurringWork()
+            lifecycleScope.launch {
+                requireContext().startService(intent)
+            }
         }
     }
 
-    private fun startRecurringWork() {
-        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-            WORK_NAME,    // The task should have a unique name.
-            ExistingPeriodicWorkPolicy.KEEP,    // If another task with the same unique name enqueued, it will be discard otherwise you can use .REPLACE instead.
-            work_repeatingRequest    // created a repeating request object
-        )
-    }
 
 
 /**Control permissions**/

@@ -2,28 +2,13 @@ package com.example.trackmytrack.utils
 
 import android.Manifest
 import android.os.Build
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import com.example.trackmytrack.SpecificWork
-import java.util.concurrent.TimeUnit
 
 /**Variables**/
 val runningQOrLater = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
 const val REQUEST_TURN_DEVICE_LOCATION_ON = 11
 const val KEY_IN_ACTION : String = "in_action"
 const val KEY_METERS_RECORDED : String = "meters"
-const val WORK_NAME = "InsertDataWorker"   // That's the name of a certain task/work
 
-val work_constraints = Constraints.Builder()
-    .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
-    .setRequiresBatteryNotLow(true)
-    .setRequiresCharging(false)
-    .build()
-
-val work_repeatingRequest = PeriodicWorkRequestBuilder<SpecificWork>(1, TimeUnit.MINUTES)
-    .setConstraints(work_constraints)
-    .build()
 
 /**Functions**/
 fun getForegroundPermissionsArray(): Array<String>
