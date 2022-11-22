@@ -4,7 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import com.example.trackmytrack.data.Record
 
-@Database(entities = [Record::class], version = 1, exportSchema = false)
+@Database(entities = [Record::class], version = 2, exportSchema = false)
 abstract class RecordDatabase : RoomDatabase()  {
 
     // Room will make the connection details with the Dao file, so you will call the Dao functions using this.

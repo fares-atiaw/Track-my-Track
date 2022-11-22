@@ -4,7 +4,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="x"
+            type="com.example.trackmytrack.data.Record" />
     </data>
 
     <com.google.android.material.circularreveal.cardview.CircularRevealCardView
@@ -34,6 +36,7 @@
                 android:textStyle="italic"
                 android:gravity="center"
                 android:textSize="16sp"
+                android:text="@{x.date}"
                 tools:text="Date"
                 />
 
@@ -45,6 +48,7 @@
                 android:gravity="center"
                 android:textColor="#B82C00"
                 android:textSize="15sp"
+                android:text="@{x.time}"
                 tools:text="Time"
                 />
 <!--1C7C20-->
@@ -82,25 +86,6 @@
                     android:gravity="center"
                     />
             </LinearLayout>
-
-
-            <TextView
-                android:id="@+id/tv_latitude"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="latitude"
-                android:textColor="#555454"
-                android:gravity="start"
-                />
-
-            <TextView
-                android:id="@+id/tv_longitude"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                tools:text="longitude"
-                android:textColor="#555454"
-                android:gravity="start"
-                />
 
         </LinearLayout>
 

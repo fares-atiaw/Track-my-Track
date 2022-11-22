@@ -10,8 +10,8 @@ import kotlinx.parcelize.Parcelize
 data class Record(
     var date: String?,
     var place: String?,
-    @PrimaryKey
     val time: String,
     var latitude: Double?,
     var longitude: Double?,
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
 ) : Parcelable

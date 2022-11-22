@@ -9,13 +9,11 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
-import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import com.example.trackmytrack.MyApp
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.utils.KEY_IN_ACTION
 import com.example.trackmytrack.utils.KEY_METERS_RECORDED
@@ -43,9 +41,7 @@ class RecordingService : LocationListener, Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     lateinit var currentTime: String
 
-    override fun onBind(p0: Intent?): IBinder? {
-        return null
-    }
+    override fun onBind(p0: Intent?): IBinder? = null
 
     @SuppressLint("MissingPermission")
     override fun onCreate() {
@@ -69,13 +65,6 @@ class RecordingService : LocationListener, Service() {
         val data = Record(currentDay, null, currentTime, location.latitude, location.longitude)
 
         val i = Intent("location_update")
-        /*ii.putExtra("currentDay",currentDay)
-        ii.putExtra("currentTime",currentTime)
-        ii.putExtra("latitude",location.latitude)
-        ii.putExtra("longitude",location.longitude)*/
-        /*val b = Bundle()
-        b.putParcelable("data", data)
-        i.putExtras(b)*/
 
         scope.launch {
             i.putExtra("data", data)

@@ -5,7 +5,7 @@ import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.repository.DefaultRepository
 import kotlinx.coroutines.launch
 
-class MainViewModel( val repo : DefaultRepository) : ViewModel() {
+class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
 
     /**variables**/
     private var _foregroundEnabled = MutableLiveData<Boolean>(false)
