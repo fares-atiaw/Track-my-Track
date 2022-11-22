@@ -71,9 +71,11 @@ class RecordingService : LocationListener, Service() {
         ii.putExtra("currentTime",currentTime)
         ii.putExtra("latitude",location.latitude)
         ii.putExtra("longitude",location.longitude)*/
-        val b = Bundle()
+        /*val b = Bundle()
         b.putParcelable("data", data)
-        i.putExtras(b)
+        i.putExtras(b)*/
+
+        i.putExtra("data", data)
 
         Log.e("onLocationChanged", "location.latitude currentDay && location.longitude $currentTime")
         Log.e("onLocationChanged", "location.latitude ${location.latitude} && location.longitude ${location.longitude}")

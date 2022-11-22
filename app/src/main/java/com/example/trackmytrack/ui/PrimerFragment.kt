@@ -2,8 +2,6 @@ package com.example.trackmytrack.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.DownloadManager
-import android.app.PendingIntent
 import android.content.*
 import android.content.IntentSender.SendIntentException
 import android.location.LocationManager
@@ -21,7 +19,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
-import androidx.work.*
 import com.example.trackmytrack.*
 import com.example.trackmytrack.R
 import com.example.trackmytrack.data.Record
@@ -32,7 +29,6 @@ import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
-
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
@@ -48,6 +44,13 @@ class PrimerFragment : Fragment() {
     lateinit var locationManager: LocationManager
     val locationPermissionCode = 2
     lateinit var intent : Intent
+
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(p0: Context?, i: Intent?) {
+
+//            viewModel.saveRecord(data)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
