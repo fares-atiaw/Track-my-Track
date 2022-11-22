@@ -72,4 +72,18 @@ dependencies {
     implementation "com.google.android.gms:play-services-location:21.0.1"
     implementation "com.google.android.gms:play-services-maps:18.1.0"
 
+    // Dependencies for local unit tests
+    testImplementation "org.hamcrest:hamcrest-all:1.3"
+    testImplementation "androidx.arch.core:core-testing:2.1.0"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4"
+    testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.4"
+//    testImplementation "org.robolectric:robolectric:4.5"
+    testImplementation "com.google.truth:truth:0.44"
+    testImplementation "org.mockito:mockito-core:3.0.0"
+
+    // AndroidX Test - JVM testing
+    testImplementation "androidx.test:core-ktx:1.5.0"
+    testImplementation "androidx.test.ext:junit-ktx:1.1.4"
+    testImplementation "androidx.test:rules:1.5.0"
+
 }
