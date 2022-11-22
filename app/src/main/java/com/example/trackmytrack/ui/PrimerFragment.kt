@@ -118,7 +118,12 @@ class PrimerFragment : Fragment() {
         viewModel.inAction.value = false
         editor.putBoolean(KEY_IN_ACTION, false)
 
+        cancelRecurringWork()
         // TODO show dialog with the meters
+    }
+
+    private fun cancelRecurringWork() {
+        WorkManager.getInstance(requireContext()).cancelUniqueWork(WORK_NAME)
     }
 
     @SuppressLint("MissingPermission")
@@ -127,7 +132,16 @@ class PrimerFragment : Fragment() {
             viewModel.inAction.value = true
             editor.putBoolean(KEY_IN_ACTION, true)
 
+            startRecurringWork()
         }
+    }
+
+    private fun startRecurringWork() {
+        WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+            WORK_NAME,    // The task should have a unique name.
+            ExistingPeriodicWorkPolicy.KEEP,    // If another task with the same unique name enqueued, it will be discard otherwise you can use .REPLACE instead.
+            work_repeatingRequest    // created a repeating request object
+        )
     }
 
 
