@@ -29,6 +29,8 @@ class RecordingService : LocationListener, Service() {
     lateinit var sharedPreference: SharedPreferences
     lateinit var editor: SharedPreferences.Editor
     var meters = 0
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
 
     @RequiresApi(Build.VERSION_CODES.O)
     lateinit var current : LocalDateTime
@@ -75,9 +77,12 @@ class RecordingService : LocationListener, Service() {
         b.putParcelable("data", data)
         i.putExtras(b)*/
 
-        i.putExtra("data", data)
+        scope.launch {
+            i.putExtra("data", data)
+            sendBroadcast(i)
+        }
 
-        Log.e("onLocationChanged", "location.latitude currentDay && location.longitude $currentTime")
+        Log.e("onLocationChanged", "location.latitude $currentDay && location.longitude $currentTime")
         Log.e("onLocationChanged", "location.latitude ${location.latitude} && location.longitude ${location.longitude}")
     }
 
@@ -90,6 +95,7 @@ class RecordingService : LocationListener, Service() {
 
     override fun onDestroy() {
         super.onDestroy()
+        job.cancel()
         editor.putBoolean(KEY_IN_ACTION, false)
         locationManager.removeUpdates(this)
     }

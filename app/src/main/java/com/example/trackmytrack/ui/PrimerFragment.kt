@@ -47,8 +47,10 @@ class PrimerFragment : Fragment() {
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, i: Intent?) {
-
-//            viewModel.saveRecord(data)
+//            val k = i?.extras
+//            val data = k?.getParcelable<Record>("data")
+            val data = i?.getParcelableExtra<Record>("data")
+            viewModel.saveRecord(data!!)
         }
     }
 
@@ -126,6 +128,7 @@ class PrimerFragment : Fragment() {
 
         lifecycleScope.launch {
             requireContext().stopService(intent)
+            requireActivity().unregisterReceiver(receiver)
         }
         // TODO show dialog with the meters
     }
@@ -138,6 +141,7 @@ class PrimerFragment : Fragment() {
 
             lifecycleScope.launch {
                 requireContext().startService(intent)
+                requireActivity().registerReceiver(receiver, IntentFilter("location_update"))
             }
         }
     }
