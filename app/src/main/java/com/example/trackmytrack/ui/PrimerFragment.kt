@@ -7,6 +7,7 @@ import android.content.IntentSender.SendIntentException
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -28,7 +29,8 @@ import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import kotlin.coroutines.CoroutineContext
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
@@ -101,7 +103,7 @@ class PrimerFragment : Fragment() {
             }
 
             btnSeeList.setOnClickListener {
-                findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
+                    findNavController().navigate(R.id.action_primerFragment_to_recordedLocationsFragment)
             }
 
             btnStartStop.setOnClickListener {
@@ -130,6 +132,7 @@ class PrimerFragment : Fragment() {
             requireContext().stopService(intent)
             requireActivity().unregisterReceiver(receiver)
         }
+        viewModel.clearRecords()
         // TODO show dialog with the meters
     }
 
@@ -239,6 +242,10 @@ class PrimerFragment : Fragment() {
         return flag
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        binding.unbind()
+    }
 
     // When we get the result from asking the user to turn on device location,
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

@@ -3,6 +3,7 @@ package com.example.trackmytrack.ui
 import androidx.lifecycle.*
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.repository.DefaultRepository
+import com.example.trackmytrack.utils.Response
 import kotlinx.coroutines.launch
 
 class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
@@ -42,8 +43,9 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
 
     /**variables**/
     // todo get required record's needs
-    val trackRecordsList : LiveData<List<Record>>?
-        get() = repo.getRecords().data
+    val allTrackRecordsList : Response<LiveData<List<Record>>> by lazy {
+        repo.getRecords()
+    }
 
     val date = MutableLiveData<String?>()
     val place = MutableLiveData<String?>()
@@ -61,14 +63,12 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
             repo.saveRecord(dataRecord)
         }
     }
-/*Record(
-                    dataRecord.date,
-                    dataRecord.place,
-                    dataRecord.timeFrom,
-                    dataRecord.timeTo,
-                    dataRecord.latitude,
-                    dataRecord.longitude
-                )*/
+
+    fun clearRecords() {
+        viewModelScope.launch {
+            repo.deleteAllRecords()
+        }
+    }
 
 
 

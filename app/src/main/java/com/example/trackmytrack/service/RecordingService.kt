@@ -33,7 +33,7 @@ class RecordingService : LocationListener, Service() {
     @RequiresApi(Build.VERSION_CODES.O)
     lateinit var current : LocalDateTime
     @RequiresApi(Build.VERSION_CODES.O)
-    val dayFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    val dayFormatter = DateTimeFormatter.ofPattern("dd-MM")
     @RequiresApi(Build.VERSION_CODES.O)
     val timeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
     @RequiresApi(Build.VERSION_CODES.O)
@@ -47,7 +47,7 @@ class RecordingService : LocationListener, Service() {
     override fun onCreate() {
         super.onCreate()
         locationManager = baseContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0F, this)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, this)
 
         sharedPreference = baseContext.getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
