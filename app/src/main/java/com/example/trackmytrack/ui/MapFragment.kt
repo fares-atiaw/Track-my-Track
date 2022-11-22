@@ -90,6 +90,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
                     .alpha(0.4f)
                     .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_YELLOW))
                 )
+
                 marker?.showInfoWindow()
             }
         }
