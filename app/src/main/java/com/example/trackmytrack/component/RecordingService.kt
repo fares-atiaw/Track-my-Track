@@ -51,6 +51,7 @@ class RecordingService : LocationListener, Service() {
         editor = sharedPreference.edit()
     }
 
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onLocationChanged(location: Location) {
         current = LocalDateTime.now()
