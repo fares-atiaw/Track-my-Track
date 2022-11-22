@@ -9,6 +9,7 @@ import android.location.Location
 import android.location.LocationListener
 import android.location.LocationManager
 import android.os.Build
+import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
 import android.widget.Toast
@@ -19,10 +20,8 @@ import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.utils.KEY_IN_ACTION
 import com.example.trackmytrack.utils.KEY_METERS_RECORDED
 import kotlinx.coroutines.*
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.coroutines.CoroutineContext
 
 class RecordingService : LocationListener, Service() {
 
@@ -65,7 +64,18 @@ class RecordingService : LocationListener, Service() {
         meters += 5
         editor.putInt(KEY_METERS_RECORDED, meters)
 
-        Log.e("onLocationChanged", "location.latitude ${currentDay} && location.longitude ${currentTime}")
+        val data = Record(currentDay, null, currentTime, location.latitude, location.longitude)
+
+        val i = Intent("location_update")
+        /*ii.putExtra("currentDay",currentDay)
+        ii.putExtra("currentTime",currentTime)
+        ii.putExtra("latitude",location.latitude)
+        ii.putExtra("longitude",location.longitude)*/
+        val b = Bundle()
+        b.putParcelable("data", data)
+        i.putExtras(b)
+
+        Log.e("onLocationChanged", "location.latitude currentDay && location.longitude $currentTime")
         Log.e("onLocationChanged", "location.latitude ${location.latitude} && location.longitude ${location.longitude}")
     }
 
