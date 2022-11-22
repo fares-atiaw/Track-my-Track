@@ -2,10 +2,12 @@ package com.example.trackmytrack.ui
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.Dialog
 import android.content.*
 import android.content.IntentSender.SendIntentException
 import android.location.LocationManager
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.provider.Settings
@@ -13,8 +15,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -47,6 +51,7 @@ class PrimerFragment : Fragment() {
     val locationPermissionCode = 2
     lateinit var intent : Intent
     var meters = 0
+    private lateinit var dialog: Dialog
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, i: Intent?) {
@@ -60,12 +65,12 @@ class PrimerFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-
         sharedPreference = requireContext().getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
 
+        locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         intent = Intent(context, RecordingService::class.java)
+        dialog = Dialog(requireContext())
 
         /**Check at first**/
         if(requireContext().isForegroundLocationPermissionsGranted())
@@ -129,6 +134,29 @@ class PrimerFragment : Fragment() {
         return binding.root
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        dialog.apply {
+            setContentView(R.layout.custom_final_dialog)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                dialog.window?.setBackgroundDrawable(
+                    AppCompatResources.getDrawable(
+                        context,
+                        R.drawable.dialog_design
+                    )
+                )
+            }
+            window?.setLayout(
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            window?.attributes?.windowAnimations = R.style.DialogAnimation
+
+            setCancelable(true)
+        }
+    }
+
     private fun stopProcesses() {
         viewModel.inAction.value = false
         editor.putBoolean(KEY_IN_ACTION, false)
@@ -136,12 +164,9 @@ class PrimerFragment : Fragment() {
         requireContext().stopService(intent)
         requireActivity().unregisterReceiver(receiver)
 
-        showDialog()
+        dialog.findViewById<TextView>(R.id.tv_final_message).text = "You have crossed $meters meters"
+        dialog.show()
         viewModel.clearRecords()
-    }
-
-    private fun showDialog() {
-        // TODO show the result at the end
     }
 
     @SuppressLint("MissingPermission")
