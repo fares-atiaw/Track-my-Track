@@ -33,7 +33,9 @@
                 android:value="" />
         </activity>
 
-        <service android:name=".service.RecordingService"/>
+        <service android:name=".component.RecordingService"/>
+
+<!--        <receiver android:name=".component.MyLocationReceiver"/>-->
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

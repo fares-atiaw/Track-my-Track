@@ -3,13 +3,13 @@ package com.example.trackmytrack.ui
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.app.Dialog
+import android.app.PendingIntent
 import android.content.*
 import android.content.IntentSender.SendIntentException
 import android.location.LocationManager
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.os.Handler
 import android.provider.Settings
 import android.util.Log
 import android.view.LayoutInflater
@@ -22,19 +22,17 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.location.LocationManagerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.example.trackmytrack.*
 import com.example.trackmytrack.R
+import com.example.trackmytrack.component.MyLocationReceiver
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.databinding.FragmentPrimerBinding
-import com.example.trackmytrack.service.RecordingService
+import com.example.trackmytrack.component.RecordingService
 import com.example.trackmytrack.utils.*
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.*
-import kotlin.coroutines.CoroutineContext
 
 class PrimerFragment : Fragment() {
     private val TAG = PrimerFragment::class.java.simpleName
@@ -48,15 +46,15 @@ class PrimerFragment : Fragment() {
     lateinit var sharedPreference: SharedPreferences
     lateinit var editor: SharedPreferences.Editor
     lateinit var locationManager: LocationManager
+    lateinit var locationRequest : LocationRequest
+    lateinit var focusedLocationProviderClient : FusedLocationProviderClient
     val locationPermissionCode = 2
-    lateinit var intent : Intent
+    lateinit var intentService : Intent
     var meters = 0
     private lateinit var dialog: Dialog
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, i: Intent?) {
-//            val k = i?.extras
-//            val data = k?.getParcelable<Record>("data")
             val data = i?.getParcelableExtra<Record>("data")
             viewModel.saveRecord(data!!)
         }
@@ -69,7 +67,7 @@ class PrimerFragment : Fragment() {
         editor = sharedPreference.edit()
 
         locationManager = requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        intent = Intent(context, RecordingService::class.java)
+        intentService = Intent(context, RecordingService::class.java)
         dialog = Dialog(requireContext())
 
         /**Check at first**/
@@ -89,6 +87,7 @@ class PrimerFragment : Fragment() {
 
         if((requireActivity() as MainActivity).sharedPreference.getBoolean(KEY_IN_ACTION, false))
             viewModel.inAction.value = true
+        // I couldn't know why it's not true ????
 
         viewModel.allTrackRecordsList.data?.observe(viewLifecycleOwner) { result ->
             meters = result.size * 5
@@ -161,7 +160,7 @@ class PrimerFragment : Fragment() {
         viewModel.inAction.value = false
         editor.putBoolean(KEY_IN_ACTION, false)
 
-        requireContext().stopService(intent)
+        requireContext().stopService(intentService)
         requireActivity().unregisterReceiver(receiver)
 
         dialog.findViewById<TextView>(R.id.tv_final_message).text = "You have crossed $meters meters"
@@ -175,12 +174,26 @@ class PrimerFragment : Fragment() {
             viewModel.inAction.value = true
             editor.putBoolean(KEY_IN_ACTION, true)
 
-            requireContext().startService(intent)
+//            focusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+//            focusedLocationProviderClient.requestLocationUpdates(locationRequest, receiverPendingIntent)
+
+            requireContext().startService(intentService)
             requireActivity().registerReceiver(receiver, IntentFilter("location_update"))
         }
     }
 
+//    private val receiverPendingIntent: PendingIntent by lazy {
+//        val intentReceiver = Intent(context, MyLocationReceiver::class.java)
+//        PendingIntent.getBroadcast(context, 0, intentReceiver, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+//    }
 
+    private fun buildLocationRequest() {
+        locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
+            .setWaitForAccurateLocation(false)
+            .setMinUpdateIntervalMillis(500)
+            .setMaxUpdateDelayMillis(1000)
+            .build()
+    }
 
 /**Control permissions**/
     private val foregroundPermissionResult = registerForActivityResult(
@@ -229,16 +242,13 @@ class PrimerFragment : Fragment() {
 /**Check Device Location Settings Then Start Geofence**/
     private fun checkDeviceLocationSettingsThenStartWork() : Boolean
     {
+        buildLocationRequest()
+
         /**  At first  **/
         if(LocationManagerCompat.isLocationEnabled(locationManager))
             return true
 
         /**  1- Get some info about the device-location */
-        val locationRequest = LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 1000)
-            .setWaitForAccurateLocation(false)
-            .setMinUpdateIntervalMillis(500)
-            .setMaxUpdateDelayMillis(1000)
-            .build()
         val builder = LocationSettingsRequest.Builder().addLocationRequest(locationRequest).setAlwaysShow(true)
         val settingsClient = LocationServices.getSettingsClient(requireContext())
         val locationSettingsResponse = settingsClient.checkLocationSettings(builder.build())
@@ -276,6 +286,7 @@ class PrimerFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         binding.unbind()
+        viewModel.clearRecords()
     }
 
     // When we get the result from asking the user to turn on device location,
