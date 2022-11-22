@@ -45,7 +45,7 @@ class RecordingService : LocationListener, Service() {
     override fun onCreate() {
         super.onCreate()
         locationManager = baseContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 99999, 5F, this)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 5F, this)
 
         sharedPreference = baseContext.getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()

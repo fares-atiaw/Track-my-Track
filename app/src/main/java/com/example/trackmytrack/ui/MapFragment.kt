@@ -79,7 +79,7 @@ class MapFragment : Fragment(), OnMapReadyCallback {
         val currentLocation = lista[lista.size-1]
         val myHome = LatLng(currentLocation.latitude!!, currentLocation.longitude!!)
 
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myHome, 25f))
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myHome, 20f))
 
         map = googleMap.apply {
             for (loc in lista) {
