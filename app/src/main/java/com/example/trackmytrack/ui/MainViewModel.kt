@@ -41,11 +41,11 @@ class MainViewModel(private val repo : DefaultRepository) : ViewModel() {
 //    }
 
 
-    /**variables**/
-    // todo get required record's needs
+    /**variables**/ // get required record's needs
     val allTrackRecordsList : Response<LiveData<List<Record>>> by lazy {
         repo.getRecords()
     }
+
 
     val date = MutableLiveData<String?>()
     val place = MutableLiveData<String?>()

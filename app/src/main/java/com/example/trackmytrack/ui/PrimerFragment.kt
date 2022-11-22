@@ -46,6 +46,7 @@ class PrimerFragment : Fragment() {
     lateinit var locationManager: LocationManager
     val locationPermissionCode = 2
     lateinit var intent : Intent
+    var meters = 0
 
     private val receiver = object : BroadcastReceiver() {
         override fun onReceive(p0: Context?, i: Intent?) {
@@ -83,6 +84,10 @@ class PrimerFragment : Fragment() {
 
         if((requireActivity() as MainActivity).sharedPreference.getBoolean(KEY_IN_ACTION, false))
             viewModel.inAction.value = true
+
+        viewModel.allTrackRecordsList.data?.observe(viewLifecycleOwner) { result ->
+            meters = result.size * 5
+        }
 
         /**Views**/
         binding.apply {
@@ -131,8 +136,12 @@ class PrimerFragment : Fragment() {
         requireContext().stopService(intent)
         requireActivity().unregisterReceiver(receiver)
 
+        showDialog()
         viewModel.clearRecords()
-        // TODO show dialog with the meters
+    }
+
+    private fun showDialog() {
+        // TODO show the result at the end
     }
 
     @SuppressLint("MissingPermission")

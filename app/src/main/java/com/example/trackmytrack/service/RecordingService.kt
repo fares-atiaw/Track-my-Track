@@ -16,7 +16,6 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import com.example.trackmytrack.data.Record
 import com.example.trackmytrack.utils.KEY_IN_ACTION
-import com.example.trackmytrack.utils.KEY_METERS_RECORDED
 import kotlinx.coroutines.*
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -26,7 +25,6 @@ class RecordingService : LocationListener, Service() {
     lateinit var locationManager : LocationManager
     lateinit var sharedPreference: SharedPreferences
     lateinit var editor: SharedPreferences.Editor
-    var meters = 0
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -47,11 +45,10 @@ class RecordingService : LocationListener, Service() {
     override fun onCreate() {
         super.onCreate()
         locationManager = baseContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0F, this)
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 500, 0F, this)
 
         sharedPreference = baseContext.getSharedPreferences("PREFERENCE_NAME", AppCompatActivity.MODE_PRIVATE)
         editor = sharedPreference.edit()
-        editor.putInt(KEY_METERS_RECORDED, meters)
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
@@ -59,8 +56,6 @@ class RecordingService : LocationListener, Service() {
         current = LocalDateTime.now()
         currentDay = LocalDateTime.now().format(dayFormatter)
         currentTime = LocalDateTime.now().format(timeFormatter)
-        meters += 5
-        editor.putInt(KEY_METERS_RECORDED, meters)
 
         val data = Record(currentDay, null, currentTime, location.latitude, location.longitude)
 
@@ -71,8 +66,7 @@ class RecordingService : LocationListener, Service() {
             sendBroadcast(i)
         }
 
-        Log.e("onLocationChanged", "location.latitude $currentDay && location.longitude $currentTime")
-        Log.e("onLocationChanged", "location.latitude ${location.latitude} && location.longitude ${location.longitude}")
+        Log.e("onLocationChanged", "Time $currentTime && location.latitude ${location.latitude} && location.longitude ${location.longitude}")
     }
 
     override fun onProviderDisabled(provider: String) {
